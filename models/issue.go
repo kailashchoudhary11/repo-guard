@@ -1,10 +1,11 @@
 package models
 
 type Issue struct {
-	ID                uint32 `json:"id"`
-	Number            uint16 `json:"number"`
-	Title             string `json:"title"`
+	ID                int64  `json:"id"`
+	Number            int    `json:"number"`
 	State             string `json:"state"`
+	Title             string `json:"title"`
+	Body              string `json:"body"`
 	URL               string `json:"url"`
 	RepositoryURL     string `json:"repository_url"`
 	LabelsURL         string `json:"labels_url"`

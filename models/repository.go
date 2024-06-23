@@ -5,4 +5,5 @@ type Repository struct {
 	Name     string `json:"name"`
 	FullName string `json:"full_name"`
 	Private  bool   `json:"private"`
+	Owner    User   `json:"owner"`
 }
