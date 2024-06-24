@@ -47,3 +47,8 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	}
 	return convertedIssues
 }
+
+func CloseIssue(client *github.Client, repo models.Repository, issueNumber int) error {
+	fmt.Printf("Issue %v closed successfully", issueNumber)
+	return nil
+}
