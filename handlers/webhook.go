@@ -26,16 +26,15 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("Webhook payload", webhookPayload)
 
 	if webhookPayload.Action == "opened" {
 		fmt.Println("New issue opened")
-		if webhookPayload.Issue.AuthorAssociation == "OWNER" {
-			fmt.Println("Issue is opened by repo owner, skipping checks")
-			return
-		}
+		// if webhookPayload.Issue.AuthorAssociation == "OWNER" {
+		// 	fmt.Println("Issue is opened by repo owner, skipping checks")
+		// 	return
+		// }
 		if isSpamIssue := validateIssue(webhookPayload.Repository, &webhookPayload.Issue); isSpamIssue {
-			fmt.Println("The issue is spam, closing it")
+			fmt.Println("The duplicate issue is closed successfully")
 		}
 	}
 }
@@ -55,9 +54,15 @@ func validateIssue(repo models.Repository, currentIssue *models.Issue) bool {
 
 	}
 	for i := 0; i < len(allOpenIssues); i++ {
-		if <-duplicateIssue > -1 {
-			fmt.Printf("The issue %v is duplicate\n", duplicateIssue)
-			services.CloseIssue(initializers.GithubClient, repo, currentIssue.Number)
+		issueNumber := <-duplicateIssue
+		if issueNumber > -1 {
+			fmt.Printf("The issue is duplicate of %v, closing the issue.\n", issueNumber)
+			closingReason := fmt.Sprintf("A similar issue already exists. Please check issue number #%v", issueNumber)
+			err := services.CloseIssue(initializers.GithubClient, repo, currentIssue.Number, closingReason)
+			if err != nil {
+				fmt.Println("Error in closing the issue", err)
+				return false
+			}
 			return true
 		}
 	}
@@ -93,7 +98,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 		isDuplicate <- -1
 	}
 	if response.Similarity > 0.75 {
-		isDuplicate <- issueOne.Number
+		isDuplicate <- issueTwo.Number
 	}
 
 	isDuplicate <- -1

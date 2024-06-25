@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	initializers.LoadDotEnv()
 	initializers.LoadGithubClient()
 	router := http.NewServeMux()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

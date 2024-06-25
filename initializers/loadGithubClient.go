@@ -1,11 +1,18 @@
 package initializers
 
 import (
+	"os"
+
 	"github.com/google/go-github/v62/github"
 )
 
 var GithubClient *github.Client
 
 func LoadGithubClient() {
-	GithubClient = github.NewClient(nil)
+	token, isTokenPresent := os.LookupEnv("GITHUB_ACCESS_TOKEN")
+	if isTokenPresent {
+		GithubClient = github.NewClient(nil).WithAuthToken(token)
+	} else {
+		GithubClient = github.NewClient(nil)
+	}
 }

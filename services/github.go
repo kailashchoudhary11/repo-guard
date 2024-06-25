@@ -48,7 +48,26 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	return convertedIssues
 }
 
-func CloseIssue(client *github.Client, repo models.Repository, issueNumber int) error {
-	fmt.Printf("Issue %v closed successfully", issueNumber)
+func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, reason string) error {
+	if reason != "" {
+		issueComment := github.IssueComment{
+			Body: &reason,
+		}
+		_, _, err := client.Issues.CreateComment(context.Background(), repo.Owner.Username, repo.Name, issueNumber, &issueComment)
+		if err != nil {
+			fmt.Println("Error in adding comment", err)
+			return err
+		}
+	}
+
+	state := "closed"
+	issueRequest := github.IssueRequest{
+		State: &state,
+	}
+	_, _, err := client.Issues.Edit(context.Background(), repo.Owner.Username, repo.Name, issueNumber, &issueRequest)
+	if err != nil {
+		fmt.Println("Error in closing issue", err)
+		return err
+	}
 	return nil
 }
