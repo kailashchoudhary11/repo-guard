@@ -42,14 +42,21 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 
 func validateIssue(repo models.Repository, currentIssue *models.Issue) bool {
 	fmt.Println("Validating the issue", currentIssue.Number)
+
+	duplicateIssue := make(chan int)
+
 	allOpenIssues := services.FetchIssues(initializers.GithubClient, repo)
 	for _, issue := range allOpenIssues {
 		if issue.Number == currentIssue.Number {
 			continue
 		}
 
-		if isDuplicate := compareIssues(currentIssue, issue); isDuplicate {
-			fmt.Printf("The issue %v is duplicate\n", issue.Number)
+		go compareIssues(currentIssue, issue, duplicateIssue)
+
+	}
+	for i := 0; i < len(allOpenIssues); i++ {
+		if <-duplicateIssue > -1 {
+			fmt.Printf("The issue %v is duplicate\n", duplicateIssue)
 			services.CloseIssue(initializers.GithubClient, repo, currentIssue.Number)
 			return true
 		}
@@ -57,7 +64,7 @@ func validateIssue(repo models.Repository, currentIssue *models.Issue) bool {
 	return false
 }
 
-func compareIssues(issueOne *models.Issue, issueTwo *models.Issue) bool {
+func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {
 	payload := fmt.Sprintf(`{"issue1_title": "%v", "issue1_body": "", "issue2_title": "%v", "issue2_body": "" }`, issueOne.Title, issueTwo.Title)
 	jsonBody := []byte(payload)
 
@@ -70,21 +77,24 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue) bool {
 	res, err := http.Post(requestURL, "application/json", bodyReader)
 	if err != nil {
 		fmt.Println("Error in making compare issues request", err)
-		return false
+		isDuplicate <- -1
 	}
 
 	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
 		fmt.Println("Cannot read response body", err)
-		return false
+		isDuplicate <- -1
 	}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		fmt.Println("Response is in invalid format", err)
-		return false
+		isDuplicate <- -1
+	}
+	if response.Similarity > 0.75 {
+		isDuplicate <- issueOne.Number
 	}
 
-	return response.Similarity > 0.75
+	isDuplicate <- -1
 }
