@@ -20,13 +20,13 @@ func main() {
 	router.HandleFunc("/webhook", handlers.Webhook)
 	router.HandleFunc("/issues", func(w http.ResponseWriter, r *http.Request) {
 		repo := models.Repository{
-			Name: "test-repo",
+			Name: "Moksh",
 			Owner: models.User{
-				Username: "kailashchoudhary11",
+				Username: "akshitagupta15june",
 			},
 		}
 		issues := services.FetchIssues(initializers.GithubClient, repo)
-		fmt.Println("The issues are", issues)
+		fmt.Println("The number of issues are ", len(issues))
 	})
 	fmt.Println("Service is up and running at port 8000")
 	http.ListenAndServe(":8000", router)
