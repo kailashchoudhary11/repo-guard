@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -8,21 +9,25 @@ import (
 	"github.com/kailashchoudhary11/repo-guard/initializers"
 	"github.com/kailashchoudhary11/repo-guard/models"
 	"github.com/kailashchoudhary11/repo-guard/services"
+	"github.com/kailashchoudhary11/repo-guard/templates"
 )
 
 func main() {
 	initializers.LoadDotEnv()
 	initializers.LoadGithubClient()
 	router := http.NewServeMux()
+	router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static")))) // if using net/http
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Service is up and running")
+		index := templates.HomePage()
+		index.Render(context.Background(), w)
 	})
+
 	router.HandleFunc("/webhook", handlers.Webhook)
 	router.HandleFunc("/issues", func(w http.ResponseWriter, r *http.Request) {
 		repo := models.Repository{
-			Name: "Moksh",
+			Name: "Flipkart_Clone",
 			Owner: models.User{
-				Username: "akshitagupta15june",
+				Username: "arghadipmanna101",
 			},
 		}
 		issues := services.FetchIssues(initializers.GithubClient, repo)
