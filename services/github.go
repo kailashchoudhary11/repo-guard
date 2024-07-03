@@ -2,7 +2,16 @@ package services
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/google/go-github/v62/github"
 	"github.com/kailashchoudhary11/repo-guard/models"
@@ -60,7 +69,9 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	go _fetchIssuesForPage(client, repo, 1, ch, countCh, true)
 	allIssues = append(allIssues, <-ch...)
 	lastPage := <-countCh
+	fmt.Println("The last issue is", lastPage)
 	if lastPage == 0 {
+		fmt.Println("Returning the issues")
 		return allIssues
 	}
 	for i := 2; i <= lastPage; i++ {
@@ -95,4 +106,71 @@ func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, 
 		return err
 	}
 	return nil
+}
+
+func GenerateJWTForApp(clientId, filePath string) (string, error) {
+	// Read the private key
+	privatePem, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	// Parse the PEM block
+	block, _ := pem.Decode(privatePem)
+	if block == nil || block.Type != "RSA PRIVATE KEY" {
+		return "", err
+	}
+
+	// Parse the RSA private key
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return "", err
+	}
+
+	// Define the payload
+	now := time.Now().Unix()
+	payload := jwt.MapClaims{
+		"iat": now - 60,        // issued at time, 60 seconds in the past to allow for clock drift
+		"exp": now + (10 * 60), // expiration time (10 minute maximum)
+		"iss": clientId,        // GitHub App's client ID
+	}
+
+	// Create the token
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, payload)
+
+	// Sign the token with the private key
+	tokenString, err := token.SignedString(privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func GetInstallationAccessToken(installationId int, jwtToken string) string {
+	response := struct {
+		Token string `json:"token"`
+	}{}
+
+	requestURL := fmt.Sprintf("https://api.github.com/app/installations/%v/access_tokens", installationId)
+	req, err := http.NewRequest("POST", requestURL, nil)
+	if err != nil {
+		fmt.Println("Cannot create the post request to get token", err)
+		return ""
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error in generating the installation access token", err)
+		return ""
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error in generating the installation access token", err)
+		return ""
+	}
+	json.Unmarshal(body, &response)
+	return response.Token
 }

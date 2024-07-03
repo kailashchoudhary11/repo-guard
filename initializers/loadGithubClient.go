@@ -16,3 +16,7 @@ func LoadGithubClient() {
 		GithubClient = github.NewClient(nil)
 	}
 }
+
+func GetClientWithToken(accessToken string) *github.Client {
+	return github.NewClient(nil).WithAuthToken(accessToken)
+}

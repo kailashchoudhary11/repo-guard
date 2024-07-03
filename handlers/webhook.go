@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
+	"github.com/google/go-github/v62/github"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
 	"github.com/kailashchoudhary11/repo-guard/models"
 	"github.com/kailashchoudhary11/repo-guard/services"
@@ -14,6 +16,13 @@ import (
 
 func Webhook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Inside webhook")
+	clientId := os.Getenv("CLIENT_ID")
+	jwtToken, err := services.GenerateJWTForApp(clientId, "repository-guard.2024-07-02.private-key.pem")
+	fmt.Println("Token", jwtToken)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Unable to read request body", http.StatusInternalServerError)
@@ -27,24 +36,27 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	accessToken := services.GetInstallationAccessToken(webhookPayload.Installation.ID, jwtToken)
+	authenticatedClient := initializers.GetClientWithToken(accessToken)
+
 	if webhookPayload.Action == "opened" {
 		fmt.Println("New issue opened")
 		// if webhookPayload.Issue.AuthorAssociation == "OWNER" {
 		// 	fmt.Println("Issue is opened by repo owner, skipping checks")
 		// 	return
 		// }
-		if isSpamIssue := validateIssue(webhookPayload.Repository, &webhookPayload.Issue); isSpamIssue {
+		if isSpamIssue := validateIssue(authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue); isSpamIssue {
 			fmt.Println("The duplicate issue is closed successfully")
 		}
 	}
 }
 
-func validateIssue(repo models.Repository, currentIssue *models.Issue) bool {
+func validateIssue(githubClient *github.Client, repo models.Repository, currentIssue *models.Issue) bool {
 	fmt.Println("Validating the issue", currentIssue.Number)
 
 	duplicateIssue := make(chan int)
 
-	allOpenIssues := services.FetchIssues(initializers.GithubClient, repo)
+	allOpenIssues := services.FetchIssues(githubClient, repo)
 	for _, issue := range allOpenIssues {
 		if issue.Number == currentIssue.Number {
 			continue
@@ -57,8 +69,8 @@ func validateIssue(repo models.Repository, currentIssue *models.Issue) bool {
 		issueNumber := <-duplicateIssue
 		if issueNumber > -1 {
 			fmt.Printf("The issue is duplicate of %v, closing the issue.\n", issueNumber)
-			closingReason := fmt.Sprintf("A similar issue already exists. Please check issue number #%v", issueNumber)
-			err := services.CloseIssue(initializers.GithubClient, repo, currentIssue.Number, closingReason)
+			closingReason := fmt.Sprintf("A similar issue already exists. Please check #%v", issueNumber)
+			err := services.CloseIssue(githubClient, repo, currentIssue.Number, closingReason)
 			if err != nil {
 				fmt.Println("Error in closing the issue", err)
 				return false

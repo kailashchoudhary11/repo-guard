@@ -2,7 +2,12 @@
 module.exports = {
   content: ['./templates/**/*.templ'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        maven: ['"Maven Pro"', 'sans-serif'],
+        rubik: ['"Rubik', 'sans-serif'],
+      }
+    },
   },
   plugins: [],
 }

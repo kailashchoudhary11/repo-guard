@@ -1,7 +1,12 @@
 package templates
 
-templ HomePage() {
-	@Layout("Repo Guard") {
-		<div>Home Page</div>
-	}
+templ HomePage(authorizationURL string) {
+@Layout("Repo Guard") {
+<div class="bg-[#0F1322] p-5">
+	<div>Home Page</div>
+	<a class="bg-[#49E06C] font-rubik px-5 py-2 rounded-lg font-bold" href={ templ.SafeURL(authorizationURL) }>
+		Authorize Repo Guard
+	</a>
+</div>
+}
 }

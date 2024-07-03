@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ."
+  cmd = "./tailwindcss -i ./static/css/input.css -o ./static/css/styles.css && go build -o ./tmp/main ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "python-service"]
   exclude_file = []
@@ -21,7 +21,7 @@ tmp_dir = "tmp"
   poll = false
   poll_interval = 0
   post_cmd = []
-  pre_cmd = ["templ generate && ./tailwindcss -i ./static/css/input.css -o ./static/css/styles.css"]
+  pre_cmd = ["templ generate"]
   rerun = false 
   rerun_delay = 500
   send_interrupt = false

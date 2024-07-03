@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/kailashchoudhary11/repo-guard/handlers"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
@@ -16,10 +17,13 @@ func main() {
 	initializers.LoadDotEnv()
 	initializers.LoadGithubClient()
 	router := http.NewServeMux()
-	router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static")))) // if using net/http
+	router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		index := templates.HomePage()
-		index.Render(context.Background(), w)
+		appName := os.Getenv("APP_NAME")
+		authorizationUrl := fmt.Sprintf("https://github.com/apps/%v/installations/new", appName)
+
+		template := templates.HomePage(authorizationUrl)
+		template.Render(context.Background(), w)
 	})
 
 	router.HandleFunc("/webhook", handlers.Webhook)
