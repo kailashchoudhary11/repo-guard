@@ -38,7 +38,7 @@ func HomePage(authorizationURL string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"bg-[#0F1322] p-5\"><div>Home Page</div><a class=\"bg-[#49E06C] font-rubik px-5 py-2 rounded-lg font-bold\" href=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex bg-[#0F1322]\"><div class=\"w-[50%] px-32 py-24 flex flex-col text-white\"><div class=\"font-maven font-semibold text-7xl\">GitHub Repository's Intelligent Gatekeeper</div><div class=\"text-[#B026FF] font-maven text-2xl font-bold\">Tired of sorting through duplicate issues?</div><div class=\"font-maven text-2xl font-bold\">Keep your repository clutter-free around the clock.</div></div><div><a class=\"bg-[#49E06C]  font-rubik px-12 py-3.5 rounded-lg font-bold\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -47,7 +47,7 @@ func HomePage(authorizationURL string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Authorize Repo Guard</a></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Authorize Repo Guard</a></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
