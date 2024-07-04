@@ -1,6 +1,6 @@
 module github.com/kailashchoudhary11/repo-guard
 
-go 1.21.12
+go 1.21
 
 require (
 	github.com/a-h/templ v0.2.731
