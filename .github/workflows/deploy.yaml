@@ -25,6 +25,5 @@ jobs:
           service-ports: "8000:http"
           service-routes: "/:8000"
           skip-cache: true
-          git-workdir: server
           service-regions: "was"
           service-instance-type: free
