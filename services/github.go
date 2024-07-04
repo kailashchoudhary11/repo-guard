@@ -110,20 +110,20 @@ func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, 
 
 func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Read the private key
-	privatePem, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
+	privatePem := os.Getenv("PRIVATE_KEY")
 
 	// Parse the PEM block
-	block, _ := pem.Decode(privatePem)
+	block, _ := pem.Decode([]byte(privatePem))
 	if block == nil || block.Type != "RSA PRIVATE KEY" {
-		return "", err
+		fmt.Println("block")
+		fmt.Println("Could not generate")
+		return "", nil
 	}
 
 	// Parse the RSA private key
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
+		fmt.Println("No token")
 		return "", err
 	}
 
@@ -141,6 +141,7 @@ func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Sign the token with the private key
 	tokenString, err := token.SignedString(privateKey)
 	if err != nil {
+		fmt.Println("No token")
 		return "", err
 	}
 

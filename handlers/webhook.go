@@ -18,7 +18,6 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Inside webhook")
 	clientId := os.Getenv("CLIENT_ID")
 	jwtToken, err := services.GenerateJWTForApp(clientId, "repository-guard.2024-07-02.private-key.pem")
-	fmt.Println("Token", jwtToken)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
