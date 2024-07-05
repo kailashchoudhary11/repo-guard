@@ -111,6 +111,7 @@ func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, 
 func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Read the private key
 	privatePem := os.Getenv("PRIVATE_KEY")
+	fmt.Print(privatePem)
 
 	// Parse the PEM block
 	block, _ := pem.Decode([]byte(privatePem))

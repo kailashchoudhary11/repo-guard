@@ -95,6 +95,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 
 	requestURL := fmt.Sprintf("%vcompare_issues", AIModelURL)
 	res, err := http.Post(requestURL, "application/json", bodyReader)
+	fmt.Println("Res", res)
 	if err != nil {
 		fmt.Println("Error in making compare issues request", err)
 		isDuplicate <- -1
@@ -112,6 +113,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 		fmt.Println("Response is in invalid format", err)
 		isDuplicate <- -1
 	}
+	fmt.Println("Response", res)
 	if response.Similarity > 0.75 {
 		isDuplicate <- issueTwo.Number
 	}
