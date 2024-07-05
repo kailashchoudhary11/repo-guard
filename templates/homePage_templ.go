@@ -38,7 +38,7 @@ func HomePage(authorizationURL string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex bg-[#0F1322]\"><div class=\"w-[50%] px-32 py-24 flex flex-col text-white\"><div class=\"font-maven font-semibold text-7xl\">GitHub Repository's Intelligent Gatekeeper</div><div class=\"text-[#B026FF] font-maven text-2xl font-bold\">Tired of sorting through duplicate issues?</div><div class=\"font-maven text-2xl font-bold\">Keep your repository clutter-free around the clock.</div></div><div><a class=\"bg-[#49E06C]  font-rubik px-12 py-3.5 rounded-lg font-bold\" href=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"bg-[#0F1322] text-white py-24\"><div class=\"container mx-auto px-4 text-center\"><h1 class=\"font-maven font-bold text-5xl md:text-7xl mb-6\"><span class=\"text-[#63DC76]\">GitHub</span> Repository's<br class=\"hidden md:inline\">Intelligent Gatekeeper</h1><p class=\"text-[#B026FF] font-maven text-xl md:text-2xl font-semibold mb-4\">Tired of sorting through duplicate issues?</p><p class=\"font-maven text-xl md:text-2xl font-semibold mb-12 max-w-3xl mx-auto\">Meet Repo Guard, the smart solution that keeps your GitHub repositories clean, organized, and efficient.</p><div class=\"flex flex-col sm:flex-row justify-center items-center gap-4\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -47,7 +47,7 @@ func HomePage(authorizationURL string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Authorize Repo Guard</a></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"inline-flex items-center justify-center gap-3 bg-[#90D3DF] hover:bg-[#90D3DF] transition-colors duration-300 text-black font-rubik px-6 py-4 rounded-lg font-bold text-lg group\"><img src=\"../static/images/github_icon.svg\" alt=\"GitHub Icon\" class=\"w-6 h-6 group-hover:scale-110 transition-transform duration-300\"> <span>Install GitHub App</span></a> <a class=\"bg-transparent hover:bg-white/10 transition-colors duration-300 border-2 border-[#49E06C]\n\t\t\ttext-[#49E06C] font-rubik px-8 py-3.5 rounded-lg font-bold text-lg\" href=\"#learn-more\">Learn More</a></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -558,20 +558,112 @@ video {
   --tw-contain-style:  ;
 }
 
+.container{
+  width: 100%;
+}
+
+@media (min-width: 640px){
+  .container{
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px){
+  .container{
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px){
+  .container{
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px){
+  .container{
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px){
+  .container{
+    max-width: 1536px;
+  }
+}
+
+.mx-auto{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mb-12{
+  margin-bottom: 3rem;
+}
+
+.mb-4{
+  margin-bottom: 1rem;
+}
+
+.mb-6{
+  margin-bottom: 1.5rem;
+}
+
 .flex{
   display: flex;
 }
 
-.w-\[50\%\]{
-  width: 50%;
+.inline-flex{
+  display: inline-flex;
+}
+
+.hidden{
+  display: none;
+}
+
+.h-6{
+  height: 1.5rem;
+}
+
+.w-6{
+  width: 1.5rem;
+}
+
+.max-w-3xl{
+  max-width: 48rem;
 }
 
 .flex-col{
   flex-direction: column;
 }
 
+.items-center{
+  align-items: center;
+}
+
+.justify-center{
+  justify-content: center;
+}
+
+.gap-3{
+  gap: 0.75rem;
+}
+
+.gap-4{
+  gap: 1rem;
+}
+
 .rounded-lg{
   border-radius: 0.5rem;
+}
+
+.border-2{
+  border-width: 2px;
+}
+
+.border-\[\#49E06C\]{
+  --tw-border-opacity: 1;
+  border-color: rgb(73 224 108 / var(--tw-border-opacity));
 }
 
 .bg-\[\#0F1322\]{
@@ -579,19 +671,33 @@ video {
   background-color: rgb(15 19 34 / var(--tw-bg-opacity));
 }
 
-.bg-\[\#49E06C\]{
+.bg-\[\#90D3DF\]{
   --tw-bg-opacity: 1;
-  background-color: rgb(73 224 108 / var(--tw-bg-opacity));
+  background-color: rgb(144 211 223 / var(--tw-bg-opacity));
 }
 
-.px-12{
-  padding-left: 3rem;
-  padding-right: 3rem;
+.bg-transparent{
+  background-color: transparent;
 }
 
 .px-32{
   padding-left: 8rem;
   padding-right: 8rem;
+}
+
+.px-4{
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.px-6{
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.px-8{
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .py-24{
@@ -609,9 +715,18 @@ video {
   padding-bottom: 0.875rem;
 }
 
+.py-4{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .py-8{
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.text-center{
+  text-align: center;
 }
 
 .font-maven{
@@ -622,19 +737,28 @@ video {
   font-family: "Rubik, sans-serif;
 }
 
-.text-2xl{
-  font-size: 1.5rem;
-  line-height: 2rem;
+.text-3xl{
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
-.text-7xl{
-  font-size: 4.5rem;
+.text-5xl{
+  font-size: 3rem;
   line-height: 1;
 }
 
 .text-lg{
   font-size: 1.125rem;
   line-height: 1.75rem;
+}
+
+.text-xl{
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.font-black{
+  font-weight: 900;
 }
 
 .font-bold{
@@ -645,12 +769,80 @@ video {
   font-weight: 600;
 }
 
+.text-\[\#49E06C\]{
+  --tw-text-opacity: 1;
+  color: rgb(73 224 108 / var(--tw-text-opacity));
+}
+
+.text-\[\#63DC76\]{
+  --tw-text-opacity: 1;
+  color: rgb(99 220 118 / var(--tw-text-opacity));
+}
+
 .text-\[\#B026FF\]{
   --tw-text-opacity: 1;
   color: rgb(176 38 255 / var(--tw-text-opacity));
 }
 
+.text-black{
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
 .text-white{
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.transition-colors{
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-transform{
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-300{
+  transition-duration: 300ms;
+}
+
+.hover\:bg-\[\#90D3DF\]:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(144 211 223 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-white\/10:hover{
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.group:hover .group-hover\:scale-110{
+  --tw-scale-x: 1.1;
+  --tw-scale-y: 1.1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@media (min-width: 640px){
+  .sm\:flex-row{
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 768px){
+  .md\:inline{
+    display: inline;
+  }
+
+  .md\:text-2xl{
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .md\:text-7xl{
+    font-size: 4.5rem;
+    line-height: 1;
+  }
 }
