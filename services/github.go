@@ -113,7 +113,6 @@ func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Read the private key
 	privatePem := os.Getenv("PRIVATE_KEY")
 	privatePem = strings.ReplaceAll(privatePem, "\\n", "\n")
-	fmt.Print(privatePem)
 
 	// Parse the PEM block
 	block, _ := pem.Decode([]byte(privatePem))
