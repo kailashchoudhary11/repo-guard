@@ -7,13 +7,11 @@ model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 @app.route('/compare_issues', methods=['POST'])
 def compare_issues():
     data = request.json
+    print("The data is", data)
     issue1_title = data.get('issue1_title')
     issue1_body = data.get('issue1_body')
     issue2_title = data.get('issue2_title')
     issue2_body = data.get('issue2_body')
-
-    if not issue1_title or not issue1_body or not issue2_title or not issue2_body:
-        return jsonify({"error": "Invalid input"}), 400
 
     issue1_text = issue1_title + " " + issue1_body
     issue2_text = issue2_title + " " + issue2_body
@@ -26,4 +24,3 @@ def compare_issues():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-

@@ -81,6 +81,7 @@ func validateIssue(githubClient *github.Client, repo models.Repository, currentI
 }
 
 func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {
+	fmt.Println("Comparing the issues")
 	payload := fmt.Sprintf(`{"issue1_title": "%v", "issue1_body": "", "issue2_title": "%v", "issue2_body": "" }`, issueOne.Title, issueTwo.Title)
 	jsonBody := []byte(payload)
 
@@ -89,7 +90,9 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 		Similarity float32 `json:"similarity"`
 	}{}
 
-	requestURL := "http://localhost:5000/compare_issues"
+	AIModelURL := os.Getenv("AI_MODEL_URL")
+
+	requestURL := fmt.Sprintf("%vcompare_issues", AIModelURL)
 	res, err := http.Post(requestURL, "application/json", bodyReader)
 	if err != nil {
 		fmt.Println("Error in making compare issues request", err)
