@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -111,6 +112,7 @@ func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, 
 func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Read the private key
 	privatePem := os.Getenv("PRIVATE_KEY")
+	privatePem = strings.ReplaceAll(privatePem, "\\n", "\n")
 	fmt.Print(privatePem)
 
 	// Parse the PEM block
