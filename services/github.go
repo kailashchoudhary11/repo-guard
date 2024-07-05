@@ -70,7 +70,6 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	go _fetchIssuesForPage(client, repo, 1, ch, countCh, true)
 	allIssues = append(allIssues, <-ch...)
 	lastPage := <-countCh
-	fmt.Println("The last issue is", lastPage)
 	if lastPage == 0 {
 		fmt.Println("Returning the issues")
 		return allIssues
@@ -81,7 +80,6 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	for i := 2; i <= lastPage; i++ {
 		allIssues = append(allIssues, <-ch...)
 	}
-	fmt.Println("Fetched the issues")
 	return allIssues
 }
 
@@ -117,15 +115,12 @@ func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Parse the PEM block
 	block, _ := pem.Decode([]byte(privatePem))
 	if block == nil || block.Type != "RSA PRIVATE KEY" {
-		fmt.Println("block")
-		fmt.Println("Could not generate")
 		return "", nil
 	}
 
 	// Parse the RSA private key
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		fmt.Println("No token")
 		return "", err
 	}
 
@@ -143,7 +138,6 @@ func GenerateJWTForApp(clientId, filePath string) (string, error) {
 	// Sign the token with the private key
 	tokenString, err := token.SignedString(privateKey)
 	if err != nil {
-		fmt.Println("No token")
 		return "", err
 	}
 
