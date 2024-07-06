@@ -7,27 +7,32 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/google/go-github/v62/github"
+	"github.com/kailashchoudhary11/repo-guard/helpers"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
 	"github.com/kailashchoudhary11/repo-guard/models"
 	"github.com/kailashchoudhary11/repo-guard/services"
 )
 
 func Webhook(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Inside webhook")
 	clientId := os.Getenv("CLIENT_ID")
-	jwtToken, err := services.GenerateJWTForApp(clientId, "repository-guard.2024-07-02.private-key.pem")
+	privatePem := os.Getenv("PRIVATE_KEY")
+	privatePem = strings.ReplaceAll(privatePem, "\\n", "\n")
+	jwtToken, err := helpers.GenerateJWT(clientId, privatePem)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Unable to read request body", http.StatusInternalServerError)
 		return
 	}
 	defer r.Body.Close()
+
 	webhookPayload := models.WebhookPayload{}
 	if err := json.Unmarshal(body, &webhookPayload); err != nil {
 		fmt.Println("There was an error in converting json", err)
@@ -39,11 +44,6 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 	authenticatedClient := initializers.GetClientWithToken(accessToken)
 
 	if webhookPayload.Action == "opened" {
-		fmt.Println("New issue opened")
-		// if webhookPayload.Issue.AuthorAssociation == "OWNER" {
-		// 	fmt.Println("Issue is opened by repo owner, skipping checks")
-		// 	return
-		// }
 		if isSpamIssue := validateIssue(authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue); isSpamIssue {
 			fmt.Println("The duplicate issue is closed successfully")
 		}
@@ -51,8 +51,6 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateIssue(githubClient *github.Client, repo models.Repository, currentIssue *models.Issue) bool {
-	fmt.Println("Validating the issue", currentIssue.Number)
-
 	duplicateIssue := make(chan int)
 
 	allOpenIssues := services.FetchIssues(githubClient, repo)
@@ -81,7 +79,6 @@ func validateIssue(githubClient *github.Client, repo models.Repository, currentI
 }
 
 func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {
-	fmt.Println("Comparing the issues")
 	payload := fmt.Sprintf(`{"issue1_title": "%v", "issue1_body": "", "issue2_title": "%v", "issue2_body": "" }`, issueOne.Title, issueTwo.Title)
 	jsonBody := []byte(payload)
 
@@ -111,7 +108,6 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 		fmt.Println("Response is in invalid format", err)
 		isDuplicate <- -1
 	}
-	fmt.Println("Response", res)
 	if response.Similarity > 0.75 {
 		isDuplicate <- issueTwo.Number
 	}
