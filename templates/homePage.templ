@@ -46,5 +46,114 @@ templ HomePage(authorizationURL string) {
 				</div>
 			</div>
 		</div>
+		<div class="bg-[#1B2033] text-white py-16">
+			<div class="container mx-auto px-4">
+				<h2 class="font-maven font-bold text-5xl text-center mb-12">
+					Features:
+				</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div
+						class="bg-white/30 rounded-lg p-6 flex flex-col items-center text-center transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img
+							src="../static/images/detection.svg"
+							alt="Duplicate Detection"
+							class="w-16 h-16 mb-4"
+						/>
+						<p class="font-maven text-[#63DC76] font-bold text-2xl mb-2">Duplicate Detection</p>
+						<p class="font-maven text-lg">
+							AI-powered algorithm understands context, not just
+							keywords.
+						</p>
+					</div>
+					<div
+						class="bg-[#5F6370] rounded-lg p-6 flex flex-col items-center text-center transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img
+							src="../static/images/instant_action.svg"
+							alt="Instant Action"
+							class="w-16 h-16 mb-4"
+						/>
+						<p class="font-maven text-[#90D3DF] font-bold text-2xl mb-2">Instant Action</p>
+						<p class="font-maven text-lg">
+							Duplicates are handled in real-time, keeping your workflow
+							smooth.
+						</p>
+					</div>
+					<div
+						class="bg-white/30 rounded-lg p-6 flex flex-col items-center text-center transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img
+							src="../static/images/github_feature.svg"
+							alt="GitHub Integration"
+							class="w-16 h-16 mb-4"
+						/>
+						<p class="font-maven text-[#B026FF] font-bold text-2xl mb-2">GitHub Integration</p>
+						<p class="font-maven text-lg">
+							Seamlessly integrates with your existing GitHub workflow.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="bg-[#0F1322] text-white font-maven py-16">
+			<div class="container mx-auto px-4">
+				<h2 class="text-3xl md:text-4xl font-bold text-center mb-10">
+					How Repo Guard Works:
+				</h2>
+				<div class="space-y-8 max-w-2xl mx-auto">
+					<div
+						class="flex items-center space-x-4 bg-white/10 rounded-lg p-4 transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img src="../static/images/one.png" alt="Step 1" class="w-12 h-12"/>
+						<div class="text-lg">A new issue appears in your repository.</div>
+					</div>
+					<div
+						class="flex items-center space-x-4 bg-white/10 rounded-lg p-4 transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img src="../static/images/two.png" alt="Step 2" class="w-12 h-12"/>
+						<div class="text-lg">Repo Guard quickly checks for duplicates.</div>
+					</div>
+					<div
+						class="flex items-center space-x-4 bg-white/10 rounded-lg p-4 transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img src="../static/images/three.png" alt="Step 3" class="w-12 h-12"/>
+						<div class="text-lg">
+							If it's a duplicate, Repo Guard closes it and links to the
+							original.
+						</div>
+					</div>
+					<div
+						class="flex items-center space-x-4 bg-white/10 rounded-lg p-4 transition-transform duration-300 hover:transform hover:scale-105"
+					>
+						<img src="../static/images/four.png" alt="Step 4" class="w-12 h-12"/>
+						<div class="text-lg">Your repository stays tidy and contributors stay informed.</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class=" text-white py-16">
+			<div class="container mx-auto px-4">
+				<div class="flex flex-col md:flex-row items-center justify-between">
+					<div class="mb-8 md:mb-0">
+						<h2 class="font-maven text-3xl md:text-4xl font-bold mb-4">
+							Make your GitHub Repositories smarter today!
+						</h2>
+					</div>
+					<div class="flex flex-col items-center md:items-end">
+						<img src="../static/images/github_logo.png" alt="GitHub Logo" class="w-20 h-20 mb-4"/>
+						<a
+							href={ templ.SafeURL(authorizationURL) }
+							class="inline-flex items-center justify-center gap-3 bg-[#B026FF] hover:bg-[#9A20E0]
+				text-white font-rubik px-6 py-4 rounded-lg font-bold text-lg transition-all duration-300
+				transform hover:scale-105 hover:shadow-lg"
+						>
+							<img src="../static/images/github_icon.svg" alt="GitHub Icon" class="w-6 h-6"/>
+							Install GitHub App
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	}
 }

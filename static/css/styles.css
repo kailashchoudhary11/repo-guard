@@ -601,8 +601,16 @@ video {
   margin-right: auto;
 }
 
+.mb-10{
+  margin-bottom: 2.5rem;
+}
+
 .mb-12{
   margin-bottom: 3rem;
+}
+
+.mb-2{
+  margin-bottom: 0.5rem;
 }
 
 .mb-4{
@@ -613,6 +621,10 @@ video {
   margin-bottom: 1.5rem;
 }
 
+.mb-8{
+  margin-bottom: 2rem;
+}
+
 .flex{
   display: flex;
 }
@@ -621,16 +633,48 @@ video {
   display: inline-flex;
 }
 
+.grid{
+  display: grid;
+}
+
 .hidden{
   display: none;
+}
+
+.h-12{
+  height: 3rem;
+}
+
+.h-16{
+  height: 4rem;
+}
+
+.h-20{
+  height: 5rem;
 }
 
 .h-6{
   height: 1.5rem;
 }
 
+.w-12{
+  width: 3rem;
+}
+
+.w-16{
+  width: 4rem;
+}
+
+.w-20{
+  width: 5rem;
+}
+
 .w-6{
   width: 1.5rem;
+}
+
+.max-w-2xl{
+  max-width: 42rem;
 }
 
 .max-w-3xl{
@@ -639,6 +683,10 @@ video {
 
 .transform{
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.grid-cols-1{
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
 .flex-col{
@@ -653,6 +701,10 @@ video {
   justify-content: center;
 }
 
+.justify-between{
+  justify-content: space-between;
+}
+
 .gap-3{
   gap: 0.75rem;
 }
@@ -663,6 +715,22 @@ video {
 
 .gap-6{
   gap: 1.5rem;
+}
+
+.gap-8{
+  gap: 2rem;
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-y-8 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
 }
 
 .rounded-lg{
@@ -683,13 +751,44 @@ video {
   background-color: rgb(15 19 34 / var(--tw-bg-opacity));
 }
 
+.bg-\[\#1B2033\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(27 32 51 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#5F6370\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(95 99 112 / var(--tw-bg-opacity));
+}
+
 .bg-\[\#90D3DF\]{
   --tw-bg-opacity: 1;
   background-color: rgb(144 211 223 / var(--tw-bg-opacity));
 }
 
+.bg-\[\#B026FF\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(176 38 255 / var(--tw-bg-opacity));
+}
+
 .bg-transparent{
   background-color: transparent;
+}
+
+.bg-white\/10{
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.bg-white\/30{
+  background-color: rgb(255 255 255 / 0.3);
+}
+
+.p-4{
+  padding: 1rem;
+}
+
+.p-6{
+  padding: 1.5rem;
 }
 
 .px-32{
@@ -705,6 +804,11 @@ video {
 .px-6{
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+}
+
+.py-16{
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 .py-24{
@@ -732,6 +836,11 @@ video {
 
 .font-rubik{
   font-family: "Rubik, sans-serif;
+}
+
+.text-2xl{
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 
 .text-3xl{
@@ -774,6 +883,11 @@ video {
 .text-\[\#63DC76\]{
   --tw-text-opacity: 1;
   color: rgb(99 220 118 / var(--tw-text-opacity));
+}
+
+.text-\[\#90D3DF\]{
+  --tw-text-opacity: 1;
+  color: rgb(144 211 223 / var(--tw-text-opacity));
 }
 
 .text-\[\#B026FF\]{
@@ -872,6 +986,10 @@ video {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.hover\:transform:hover{
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .hover\:border-\[\#3AB057\]:hover{
   --tw-border-opacity: 1;
   border-color: rgb(58 176 87 / var(--tw-border-opacity));
@@ -884,6 +1002,11 @@ video {
 .hover\:bg-\[\#7BBAC5\]:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(123 186 197 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-\[\#9A20E0\]:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(154 32 224 / var(--tw-bg-opacity));
 }
 
 .hover\:text-\[\#3AB057\]:hover{
@@ -925,13 +1048,34 @@ video {
 }
 
 @media (min-width: 768px){
+  .md\:mb-0{
+    margin-bottom: 0px;
+  }
+
   .md\:inline{
     display: inline;
+  }
+
+  .md\:grid-cols-3{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:flex-row{
+    flex-direction: row;
+  }
+
+  .md\:items-end{
+    align-items: flex-end;
   }
 
   .md\:text-2xl{
     font-size: 1.5rem;
     line-height: 2rem;
+  }
+
+  .md\:text-4xl{
+    font-size: 2.25rem;
+    line-height: 2.5rem;
   }
 
   .md\:text-7xl{
