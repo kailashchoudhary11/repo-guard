@@ -20,4 +20,4 @@ It detects, closes duplicate issues, and comments with links to similar existing
 ## Usage
 
   - Go to the [GitHub App installation page](https://repo-guard.koyeb.app).
-  - Click **Install GitHub App** and select the repositories you want to integrate with Repo-Guard.
+  - Click **Authorize Repo Guard** and select the repositories you want to integrate with Repo-Guard.

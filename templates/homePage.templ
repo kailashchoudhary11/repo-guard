@@ -29,7 +29,7 @@ templ HomePage(authorizationURL string) {
 						<span
 							class="relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left"
 						>
-							Install GitHub App
+							Authorize Repo Guard
 						</span>
 					</a>
 					<a
@@ -132,24 +132,35 @@ templ HomePage(authorizationURL string) {
 				</div>
 			</div>
 		</div>
-		<div class=" text-white py-16">
+		<div class="bg-[#27164361] text-white py-24">
 			<div class="container mx-auto px-4">
 				<div class="flex flex-col md:flex-row items-center justify-between">
-					<div class="mb-8 md:mb-0">
-						<h2 class="font-maven text-3xl md:text-4xl font-bold mb-4">
-							Make your GitHub Repositories smarter today!
-						</h2>
+					<!-- Left side -->
+					<div class="md:w-1/2 mb-12 md:mb-0">
+						<h1 class="font-maven font-bold text-5xl md:text-7xl leading-tight">
+							Make your
+							<br/>
+							<span class="text-[#63DC76]">Github</span>
+							<br/>
+							Repositories
+							<br/>
+							<span class="text-[#B026FF]">Smarter</span> Today!
+						</h1>
 					</div>
-					<div class="flex flex-col items-center md:items-end">
-						<img src="../static/images/github_logo.png" alt="GitHub Logo" class="w-20 h-20 mb-4"/>
+					<!-- Right side -->
+					<div class="md:w-1/2 flex flex-col items-center">
+						<img
+							src="../static/images/github_logo.png"
+							alt="Repo Guard Logo"
+							class="w-56 h-56 mb-12 filter drop-shadow-xl"
+						/>
 						<a
 							href={ templ.SafeURL(authorizationURL) }
-							class="inline-flex items-center justify-center gap-3 bg-[#B026FF] hover:bg-[#9A20E0]
-				text-white font-rubik px-6 py-4 rounded-lg font-bold text-lg transition-all duration-300
-				transform hover:scale-105 hover:shadow-lg"
+							class="inline-flex items-center justify-center gap-3 bg-[#B026FF] hover:bg-[#9020DC]
+				text-white font-rubik px-8 py-4 rounded-lg font-bold text-xl group transition-all
+				duration-300 transform hover:scale-105 hover:shadow-lg"
 						>
-							<img src="../static/images/github_icon.svg" alt="GitHub Icon" class="w-6 h-6"/>
-							Install GitHub App
+							<span>Authorize Repo Guard</span>
 						</a>
 					</div>
 				</div>
