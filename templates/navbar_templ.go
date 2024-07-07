@@ -26,7 +26,7 @@ func Navbar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-[#0F1322] text-3xl font-black text-white py-8 px-32 font-maven\">Repo Guard</nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-[#0F1322] text-white py-8 px-32 font-maven flex justify-between items-center\"><a href=\"/\" class=\"text-3xl font-black\">Repo Guard</a><div class=\"space-x-8\"><a href=\"/privacy-policy\" class=\"text-xl hover:text-[#8855EA] transition-colors duration-300\">Privacy Policy</a></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

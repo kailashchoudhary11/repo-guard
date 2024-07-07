@@ -14,8 +14,9 @@ func main() {
 
 	router := http.NewServeMux()
 	router.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	router.HandleFunc("/", handlers.Index)
+	router.HandleFunc("/privacy-policy", handlers.PrivacyPolicy)
 	router.HandleFunc("/webhook", handlers.Webhook)
+	router.HandleFunc("/", handlers.Index)
 
 	fmt.Println("Service is up and running at port 8000")
 
