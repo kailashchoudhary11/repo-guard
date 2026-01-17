@@ -3,9 +3,12 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/google/go-github/v62/github"
 	"github.com/kailashchoudhary11/repo-guard/models"
@@ -125,4 +128,26 @@ func GetInstallationAccessToken(installationId int, jwtToken string) string {
 	}
 	json.Unmarshal(body, &response)
 	return response.Token
+}
+
+func IsAppInstallationOwner(ctx context.Context, client *github.Client) (bool, error) {
+	appIDStr := os.Getenv("APP_ID")
+	if appIDStr == "" {
+		return false, errors.New("APP_ID not set")
+	}
+	appID, err := strconv.ParseInt(appIDStr, 10, 64)
+	if err != nil {
+		return false, fmt.Errorf("Invalid APP_ID: %w", err)
+	}
+	installations, _, err := client.Apps.ListUserInstallations(ctx, &github.ListOptions{PerPage: 100})
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("Listed all the installations for the user", installations)
+	for _, install := range installations {
+		if *install.AppID != appID {
+			return true, nil
+		}
+	}
+	return false, nil
 }

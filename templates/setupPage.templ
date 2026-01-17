@@ -1,0 +1,68 @@
+package templates
+
+templ SetupPage() {
+	@Layout("Setup configurations") {
+		<div class="bg-[#0F1322] text-white min-h-screen py-24 font-maven">
+			<div class="container mx-auto px-4">
+				<div class="max-w-2xl mx-auto bg-white/10 rounded-2xl p-10 shadow-xl">
+
+					<h1 class="text-4xl md:text-5xl font-bold mb-4 text-center">
+						Setup <span class="text-[#63DC76]">Repo Guard</span>
+					</h1>
+
+					<p class="text-center text-lg text-gray-300 mb-10">
+						Configure how Repo Guard should handle duplicate issues in your repositories.
+					</p>
+
+					<form method="POST" action="/setup/save" class="space-y-10">
+
+						<!-- Toggle setting -->
+						<div class="flex items-center justify-between bg-white/5 rounded-xl p-6">
+							<div class="pr-6">
+								<label for="auto_close" class="block text-xl font-semibold mb-2">
+									Automatically close duplicate issues
+								</label>
+								<p class="text-gray-400 text-sm">
+									When enabled, Repo Guard will automatically close newly created issues
+									that are detected as duplicates and link them to the original issue.
+								</p>
+							</div>
+
+							<!-- Toggle -->
+							<label class="relative inline-flex items-center cursor-pointer">
+								<input
+									type="checkbox"
+									id="auto_close"
+									name="auto_close"
+									class="sr-only peer"
+								/>
+								<div
+									class="w-14 h-8 bg-gray-600 rounded-full peer
+									peer-checked:bg-[#63DC76]
+									after:content-[''] after:absolute after:top-1 after:left-1
+									after:bg-[#0F1322] after:rounded-full after:h-6 after:w-6
+									after:transition-all peer-checked:after:translate-x-6">
+								</div>
+							</label>
+						</div>
+
+						<!-- Submit -->
+						<div class="flex justify-end">
+							<button
+								type="submit"
+								class="inline-flex items-center justify-center gap-3
+								bg-[#B026FF] hover:bg-[#9020DC]
+								text-white font-rubik px-8 py-4 rounded-lg font-bold text-lg
+								transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+							>
+								Save Configuration
+							</button>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+		</div>
+	}
+}
