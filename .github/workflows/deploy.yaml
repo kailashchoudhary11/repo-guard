@@ -1,9 +1,7 @@
 name: Build and deploy the application to Koyeb
 
 on:
-  push:
-    branches:
-      - 'main'
+  workflow_dispatch:
 
 jobs:
   deploy:
