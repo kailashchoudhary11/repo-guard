@@ -9,6 +9,18 @@ services:
     ports:
       - "8233:8233"
 
+  postgres:
+    image: postgres:16
+    container_name: repoguard-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "8345:5432"
+
   repoguard:
     build:
       context: .
@@ -18,5 +30,6 @@ services:
       - repo-model
     ports:
       - "8344:8000"
-    environment:
-      COMPARE_SERVICE_URL: http://repo-model:8233
+
+volumes:
+  postgres_data:

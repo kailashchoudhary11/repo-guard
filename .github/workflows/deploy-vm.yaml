@@ -65,7 +65,7 @@ jobs:
             docker compose build
 
             echo "🚀 Starting services..."
-            docker compose up -d
+            docker compose --env-file .env up -d
 
             echo "✅ Deployment finished successfully"
           EOF
