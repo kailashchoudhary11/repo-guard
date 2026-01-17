@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -o app
 
 # -------- Runtime stage --------
-FROM golang:1.21-alpine
+FROM golang:1.25-alpine
 
 WORKDIR /app
 
@@ -27,6 +27,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # Copy binary
 COPY --from=builder /app/app /app/app
 COPY --from=builder /app/.env /app/.env
+COPY --from=builder /app/static /app/static
 
 EXPOSE 8000
 

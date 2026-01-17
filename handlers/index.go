@@ -12,7 +12,6 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 	appName := os.Getenv("APP_NAME")
 	authorizationUrl := fmt.Sprintf("https://github.com/apps/%v/installations/new", appName)
-	fmt.Println(authorizationUrl)
 
 	template := templates.HomePage(authorizationUrl)
 	template.Render(context.Background(), w)
