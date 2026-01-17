@@ -145,7 +145,7 @@ func IsAppInstallationOwner(ctx context.Context, client *github.Client) (bool, e
 	}
 	fmt.Println("Listed all the installations for the user", installations)
 	for _, install := range installations {
-		if *install.AppID != appID {
+		if *install.AppID == appID {
 			return true, nil
 		}
 	}
