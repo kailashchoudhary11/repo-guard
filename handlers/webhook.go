@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/google/go-github/v62/github"
 	db "github.com/kailashchoudhary11/repo-guard/db/generated"
@@ -66,45 +67,69 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleSimilarityCheck(ctx context.Context, githubClient *github.Client, repo models.Repository, currentIssue *models.Issue, shouldClose bool) bool {
-	duplicateIssue := make(chan int)
-
+func handleSimilarityCheck(
+	ctx context.Context,
+	githubClient *github.Client,
+	repo models.Repository,
+	currentIssue *models.Issue,
+	shouldClose bool,
+) {
 	allOpenIssues := services.FetchIssues(githubClient, repo)
+
+	duplicateIssue := make(chan int, len(allOpenIssues))
+	var wg sync.WaitGroup
+
 	for _, issue := range allOpenIssues {
 		if issue.Number == currentIssue.Number {
 			continue
 		}
 
-		go compareIssues(currentIssue, issue, duplicateIssue)
-
+		wg.Add(1)
+		go func(issue *models.Issue) {
+			defer wg.Done()
+			compareIssues(currentIssue, issue, duplicateIssue)
+		}(issue)
 	}
+
+	go func() {
+		wg.Wait()
+		close(duplicateIssue)
+	}()
+
 	similarIssues := []int{}
-	issueComment := fmt.Sprintf("Similar open issues already exist. Please check")
-	for i := 0; i < len(allOpenIssues); i++ {
-		issueNumber := <-duplicateIssue
+	issueLinks := []string{}
+
+	for issueNumber := range duplicateIssue {
 		if issueNumber > -1 {
-			issueComment = fmt.Sprintf("%v #%v,", issueComment, issueNumber)
 			similarIssues = append(similarIssues, issueNumber)
+			issueLinks = append(issueLinks, fmt.Sprintf("#%d", issueNumber))
 		}
 	}
+
 	if len(similarIssues) == 0 {
 		fmt.Println("No similar issues found")
-		return false
+		return
 	}
 
-	fmt.Printf("The similar issues are", similarIssues)
+	issueComment := fmt.Sprintf(
+		"⚠️ It looks like similar open issues already exist: %s.\n"+
+			"Please check these before proceeding to avoid duplicates.",
+		strings.Join(issueLinks, ", "),
+	)
 
 	if err := services.AddComment(ctx, githubClient, repo, currentIssue.Number, issueComment); err != nil {
 		fmt.Println("Error in adding comment on the issue", err)
-		return false
+		return
 	}
+
 	if shouldClose {
 		if err := services.CloseIssue(ctx, githubClient, repo, currentIssue.Number); err != nil {
 			fmt.Println("Error in closing the issue", err)
-			return false
+			return
 		}
 	}
-	return true
+
+	return
 }
 
 func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {
@@ -124,6 +149,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 	if err != nil {
 		fmt.Println("Error in making compare issues request", err)
 		isDuplicate <- -1
+		return
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -132,6 +158,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 	if err != nil {
 		fmt.Println("Cannot read response body", err)
 		isDuplicate <- -1
+		return
 	}
 	fmt.Println(response)
 
@@ -139,9 +166,11 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 	if err != nil {
 		fmt.Println("Response is in invalid format", err)
 		isDuplicate <- -1
+		return
 	}
-	if response.Similarity > 0.75 {
+	if response.Similarity > 0.85 {
 		isDuplicate <- issueTwo.Number
+		return
 	}
 
 	isDuplicate <- -1
