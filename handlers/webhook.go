@@ -55,8 +55,10 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		defer conn.Close(ctx)
 		queries := db.New(conn)
 		installationDetails, err := queries.GetInstallationByInstallationID(ctx, string(webhookPayload.Installation.ID))
-
-		if config, err := installationDetails.Config(); err != nil {
+		config, err := installationDetails.Config()
+		if err != nil {
+			fmt.Println("Error in fetching installation config", err)
+		} else {
 			shouldClose = config.ShouldClose
 		}
 
