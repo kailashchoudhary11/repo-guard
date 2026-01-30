@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,8 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v62/github"
+	"github.com/jackc/pgx/v5"
+	db "github.com/kailashchoudhary11/repo-guard/db/generated"
 	"github.com/kailashchoudhary11/repo-guard/helpers"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
 	"github.com/kailashchoudhary11/repo-guard/models"
@@ -21,6 +24,7 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 	privatePem := os.Getenv("PRIVATE_KEY")
 	privatePem = strings.ReplaceAll(privatePem, "\\n", "\n")
 	jwtToken, err := helpers.GenerateJWT(clientId, privatePem)
+	ctx := r.Context()
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
@@ -40,17 +44,28 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken := services.GetInstallationAccessToken(webhookPayload.Installation.ID, jwtToken)
-	authenticatedClient := initializers.GetClientWithToken(accessToken)
-
 	if webhookPayload.Action == "opened" {
-		if isSpamIssue := validateIssue(authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue); isSpamIssue {
-			fmt.Println("The duplicate issue is closed successfully")
+		accessToken := services.GetInstallationAccessToken(webhookPayload.Installation.ID, jwtToken)
+		authenticatedClient := initializers.GetClientWithToken(accessToken)
+		shouldClose := false
+
+		conn, err := initializers.GetDBClient(ctx)
+		if err != nil {
+			fmt.Println("Unable to connect to database:", err)
 		}
+		defer conn.Close(ctx)
+		queries := db.New(conn)
+		installationDetails, err := queries.GetInstallationByInstallationID(ctx, string(webhookPayload.Installation.ID))
+
+		if config, err := installationDetails.Config(); err != nil {
+			shouldClose = config.ShouldClose
+		}
+
+		handleSimilarityCheck(r.Context(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, shouldClose)
 	}
 }
 
-func validateIssue(githubClient *github.Client, repo models.Repository, currentIssue *models.Issue) bool {
+func handleSimilarityCheck(ctx context.Context, githubClient *github.Client, repo models.Repository, currentIssue *models.Issue, shouldClose bool) bool {
 	duplicateIssue := make(chan int)
 
 	allOpenIssues := services.FetchIssues(githubClient, repo)
@@ -62,20 +77,33 @@ func validateIssue(githubClient *github.Client, repo models.Repository, currentI
 		go compareIssues(currentIssue, issue, duplicateIssue)
 
 	}
+	similarIssues := []int{}
+	issueComment := fmt.Sprintf("Similar open issues already exist. Please check")
 	for i := 0; i < len(allOpenIssues); i++ {
 		issueNumber := <-duplicateIssue
 		if issueNumber > -1 {
-			fmt.Printf("The issue is duplicate of %v, closing the issue.\n", issueNumber)
-			closingReason := fmt.Sprintf("A similar issue already exists. Please check #%v", issueNumber)
-			err := services.CloseIssue(githubClient, repo, currentIssue.Number, closingReason)
-			if err != nil {
-				fmt.Println("Error in closing the issue", err)
-				return false
-			}
-			return true
+			issueComment = fmt.Sprintf("%v #%v,", issueComment, issueNumber)
+			similarIssues = append(similarIssues, issueNumber)
 		}
 	}
-	return false
+	if len(similarIssues) == 0 {
+		fmt.Println("No similar issues found")
+		return false
+	}
+
+	fmt.Printf("The similar issues are", similarIssues)
+
+	if err := services.AddComment(ctx, githubClient, repo, currentIssue.Number, issueComment); err != nil {
+		fmt.Println("Error in adding comment on the issue", err)
+		return false
+	}
+	if shouldClose {
+		if err := services.CloseIssue(ctx, githubClient, repo, currentIssue.Number); err != nil {
+			fmt.Println("Error in closing the issue", err)
+			return false
+		}
+	}
+	return true
 }
 
 func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {

@@ -78,23 +78,24 @@ func FetchIssues(client *github.Client, repo models.Repository) []*models.Issue 
 	return allIssues
 }
 
-func CloseIssue(client *github.Client, repo models.Repository, issueNumber int, reason string) error {
-	if reason != "" {
-		issueComment := github.IssueComment{
-			Body: &reason,
-		}
-		_, _, err := client.Issues.CreateComment(context.Background(), repo.Owner.Username, repo.Name, issueNumber, &issueComment)
-		if err != nil {
-			fmt.Println("Error in adding comment", err)
-			return err
-		}
+func AddComment(ctx context.Context, client *github.Client, repo models.Repository, issueNumber int, comment string) error {
+	issueComment := github.IssueComment{
+		Body: &comment,
 	}
+	_, _, err := client.Issues.CreateComment(ctx, repo.Owner.Username, repo.Name, issueNumber, &issueComment)
+	if err != nil {
+		fmt.Println("Error in adding comment", err)
+		return err
+	}
+	return nil
+}
 
+func CloseIssue(ctx context.Context, client *github.Client, repo models.Repository, issueNumber int) error {
 	state := "closed"
 	issueRequest := github.IssueRequest{
 		State: &state,
 	}
-	_, _, err := client.Issues.Edit(context.Background(), repo.Owner.Username, repo.Name, issueNumber, &issueRequest)
+	_, _, err := client.Issues.Edit(ctx, repo.Owner.Username, repo.Name, issueNumber, &issueRequest)
 	if err != nil {
 		fmt.Println("Error in closing issue", err)
 		return err

@@ -1,15 +1,19 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "/db/queries"
-    schema: "/db/schema.sql"
+    queries: "db/queries"
+    schema: "db/schema.sql"
     gen:
       go:
         package: "db"
-        out: "db"
+        out: "db/generated"
         sql_package: "pgx/v5"
         overrides:
           - db_type: "uuid"
-            go_type: "github.com/google/uuid.UUID"
-          - db_type: "JSONB"
-            go_type: "json.RawMessage"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+          - db_type: "jsonb"
+            go_type:
+              import: "encoding/json"
+              type: "RawMessage"
