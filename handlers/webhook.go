@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v62/github"
-	"github.com/jackc/pgx/v5"
 	db "github.com/kailashchoudhary11/repo-guard/db/generated"
 	"github.com/kailashchoudhary11/repo-guard/helpers"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
