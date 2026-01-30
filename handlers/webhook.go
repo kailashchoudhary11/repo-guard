@@ -63,7 +63,7 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 			shouldClose = config.ShouldClose
 		}
 
-		handleSimilarityCheck(r.Context(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, shouldClose)
+		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, shouldClose)
 	}
 }
 
@@ -116,6 +116,8 @@ func handleSimilarityCheck(
 			"Please check these before proceeding to avoid duplicates.",
 		strings.Join(issueLinks, ", "),
 	)
+
+	fmt.Println(issueComment)
 
 	if err := services.AddComment(ctx, githubClient, repo, currentIssue.Number, issueComment); err != nil {
 		fmt.Println("Error in adding comment on the issue", err)
