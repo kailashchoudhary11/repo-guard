@@ -45,7 +45,14 @@ func Setup(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	template := templates.SetupPage(installationID)
+	user, _, err := githubClient.Users.Get(ctx, "")
+	if err != nil {
+		fmt.Println("Error fetching GitHub user:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	username := user.GetLogin()
+	template := templates.SetupPage(installationID, username)
 	if err := template.Render(ctx, w); err != nil {
 		fmt.Println("Error in rendering the template")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -89,11 +96,16 @@ func SetupSave(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close(ctx)
 
+	username := r.FormValue("username")
+	if username == "" {
+		username = "unknown"
+	}
+
 	queries := db.New(conn)
 	_, err = queries.UpsertInstallationConfig(ctx, db.UpsertInstallationConfigParams{
 		InstallationID: installationID,
 		ConfigData:     configJSON,
-		UpdatedBy:      installationID,
+		UpdatedBy:      username,
 	})
 	if err != nil {
 		fmt.Println("Error saving config to database:", err)

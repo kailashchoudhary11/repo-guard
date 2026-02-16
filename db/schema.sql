@@ -1,3 +1,5 @@
+\restrict s8VOnkf8AL7WcB5tfeIK7XRG5WgmeVnKeBvxW1NAvFQicqyTHsfZIeW5SHAAqM2
+
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 18.0 (Homebrew)
 
@@ -76,19 +78,19 @@ ALTER TABLE ONLY public.installations ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: installations installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.installations
-    ADD CONSTRAINT installations_pkey PRIMARY KEY (id);
-
-
---
 -- Name: installations installations_installation_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.installations
     ADD CONSTRAINT installations_installation_id_key UNIQUE (installation_id);
+
+
+--
+-- Name: installations installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.installations
+    ADD CONSTRAINT installations_pkey PRIMARY KEY (id);
 
 
 --
@@ -103,9 +105,13 @@ ALTER TABLE ONLY public.schema_migrations
 -- PostgreSQL database dump complete
 --
 
+\unrestrict s8VOnkf8AL7WcB5tfeIK7XRG5WgmeVnKeBvxW1NAvFQicqyTHsfZIeW5SHAAqM2
+
+
 --
 -- Dbmate schema migrations
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20260130062039');
+    ('20260130062039'),
+    ('20260215000000');
