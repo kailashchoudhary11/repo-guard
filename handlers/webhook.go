@@ -70,7 +70,7 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		config := &models.InstallationConfig{
 			ShouldClose: false,
 			Language:    "english",
-			Sensitivity: "medium",
+			Sensitivity: 90,
 		}
 
 		conn, err := initializers.GetDBClient(ctx)
@@ -92,19 +92,8 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		threshold := sensitivityToThreshold(config.Sensitivity)
+		threshold := float32(config.Sensitivity) / 100.0
 		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, config.ShouldClose, threshold)
-	}
-}
-
-func sensitivityToThreshold(sensitivity string) float32 {
-	switch sensitivity {
-	case "low":
-		return 0.90
-	case "high":
-		return 0.75
-	default:
-		return 0.85
 	}
 }
 

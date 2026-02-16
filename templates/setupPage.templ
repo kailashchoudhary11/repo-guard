@@ -45,51 +45,65 @@ templ SetupPage(installationID string, username string) {
 				transform: translateX(24px);
 			}
 
-			/* Radio cards */
-			.radio-hidden {
-				position: absolute;
-				width: 1px;
-				height: 1px;
-				overflow: hidden;
-				clip: rect(0,0,0,0);
+			/* Range slider */
+			.slider-container {
+				position: relative;
+				padding: 8px 0;
 			}
 
-			.sensitivity-card {
-				text-align: center;
-				padding: 24px 20px;
-				border-radius: 12px;
-				border: 2px solid #374151;
-				background: #1F2937;
+			.range-slider {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 100%;
+				height: 6px;
+				border-radius: 3px;
+				background: linear-gradient(90deg, #63DC76, #B026FF, #90D3DF);
+				outline: none;
 				cursor: pointer;
-				transition: all 0.3s ease;
 			}
 
-			.sensitivity-card:hover {
-				background: #374151;
-				transform: translateY(-2px);
-				box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+			.range-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				background: #fff;
+				box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+				cursor: pointer;
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
 			}
 
-			.radio-hidden:checked + .sensitivity-card.card-low {
-				border-color: #90D3DF;
-				background: linear-gradient(135deg, rgba(144,211,223,0.2), rgba(144,211,223,0.1));
-				box-shadow: 0 0 20px rgba(144,211,223,0.3), 0 4px 12px rgba(0,0,0,0.3);
+			.range-slider::-webkit-slider-thumb:hover {
+				transform: scale(1.15);
+				box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 			}
-			.radio-hidden:checked + .sensitivity-card.card-low .card-title { color: #90D3DF; }
 
-			.radio-hidden:checked + .sensitivity-card.card-medium {
-				border-color: #B026FF;
-				background: linear-gradient(135deg, rgba(176,38,255,0.2), rgba(176,38,255,0.1));
-				box-shadow: 0 0 20px rgba(176,38,255,0.3), 0 4px 12px rgba(0,0,0,0.3);
+			.range-slider::-moz-range-thumb {
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				background: #fff;
+				border: none;
+				box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+				cursor: pointer;
 			}
-			.radio-hidden:checked + .sensitivity-card.card-medium .card-title { color: #B026FF; }
 
-			.radio-hidden:checked + .sensitivity-card.card-high {
-				border-color: #63DC76;
-				background: linear-gradient(135deg, rgba(99,220,118,0.2), rgba(99,220,118,0.1));
-				box-shadow: 0 0 20px rgba(99,220,118,0.3), 0 4px 12px rgba(0,0,0,0.3);
+			.slider-labels {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 8px;
+				font-size: 0.8rem;
+				color: #9ca3af;
 			}
-			.radio-hidden:checked + .sensitivity-card.card-high .card-title { color: #63DC76; }
+
+			.slider-value {
+				text-align: center;
+				font-size: 2rem;
+				font-weight: 700;
+				color: #B026FF;
+				margin-bottom: 16px;
+			}
 
 			/* Select dropdown */
 			.custom-select {
@@ -229,38 +243,37 @@ templ SetupPage(installationID string, username string) {
 							</select>
 						</div>
 						<div class="section-divider"></div>
-						<!-- Sensitivity level -->
+						<!-- Match Threshold -->
 						<div>
-							<label class="block text-lg font-semibold mb-2">
-								Sensitivity Level
+							<label for="sensitivity" class="block text-lg font-semibold mb-2">
+								Match Threshold
 							</label>
 							<p class="field-desc mb-6">
-								Controls how similar two issues need to be before flagging as duplicate.
+								Issues must be at least this similar to be flagged as duplicates.
+								A higher value means stricter matching — only near-identical issues will be flagged.
 							</p>
-							<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-								<label>
-									<input type="radio" name="sensitivity" value="low" class="radio-hidden"/>
-									<div class="sensitivity-card card-low">
-										<span class="card-title block font-semibold text-lg mb-2">Low</span>
-										<span class="block text-gray-400 text-sm">Fewer matches</span>
-									</div>
-								</label>
-								<label>
-									<input type="radio" name="sensitivity" value="medium" class="radio-hidden" checked/>
-									<div class="sensitivity-card card-medium">
-										<span class="card-title block font-semibold text-lg mb-2">Medium</span>
-										<span class="block text-gray-400 text-sm">Balanced</span>
-									</div>
-								</label>
-								<label>
-									<input type="radio" name="sensitivity" value="high" class="radio-hidden"/>
-									<div class="sensitivity-card card-high">
-										<span class="card-title block font-semibold text-lg mb-2">High</span>
-										<span class="block text-gray-400 text-sm">More matches</span>
-									</div>
-								</label>
+							<div class="slider-container">
+								<div class="slider-value" id="sensitivity-display">90%</div>
+								<input
+									type="range"
+									id="sensitivity"
+									name="sensitivity"
+									min="0"
+									max="100"
+									value="90"
+									class="range-slider"
+								/>
+								<div class="slider-labels">
+									<span>More matches</span>
+									<span>Fewer matches</span>
+								</div>
 							</div>
 						</div>
+						<script>
+							document.getElementById('sensitivity').addEventListener('input', function() {
+								document.getElementById('sensitivity-display').textContent = this.value + '%';
+							});
+						</script>
 						<!-- Submit -->
 						<button type="submit" class="submit-btn font-rubik">
 							Save Configuration

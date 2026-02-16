@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	db "github.com/kailashchoudhary11/repo-guard/db/generated"
 	"github.com/kailashchoudhary11/repo-guard/initializers"
@@ -75,10 +76,17 @@ func SetupSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sensitivity := 90
+	if s := r.FormValue("sensitivity"); s != "" {
+		if v, err := strconv.Atoi(s); err == nil && v >= 0 && v <= 100 {
+			sensitivity = v
+		}
+	}
+
 	config := models.InstallationConfig{
 		ShouldClose: r.FormValue("auto_close") == "on",
 		Language:    r.FormValue("language"),
-		Sensitivity: r.FormValue("sensitivity"),
+		Sensitivity: sensitivity,
 	}
 
 	configJSON, err := json.Marshal(config)
