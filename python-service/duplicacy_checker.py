@@ -74,6 +74,50 @@ def compare_issues():
     ), 200
 
 
+@app.route("/batch_compare", methods=["POST"])
+def batch_compare():
+    data = request.get_json(force=True)
+
+    current = data["current_issue"]
+    others = data.get("other_issues", [])
+    threshold = data.get("threshold", 0.85)
+
+    if not others:
+        return jsonify({"similar_issues": []}), 200
+
+    # Build text list: current issue first, then all others
+    texts = [issue_text(current.get("title", ""), current.get("body", ""))]
+    for issue in others:
+        texts.append(issue_text(issue.get("title", ""), issue.get("body", "")))
+
+    # Single batch encode — all texts processed in one call
+    embeddings = model.encode(
+        texts,
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+        show_progress_bar=False,
+        batch_size=64,
+    )
+
+    # Cosine similarity of current (index 0) against all others
+    current_embedding = embeddings[0].reshape(1, -1)
+    other_embeddings = embeddings[1:]
+    similarities = cosine_similarity(current_embedding, other_embeddings)[0]
+
+    # Filter by threshold
+    similar_issues = []
+    for i, sim in enumerate(similarities):
+        if sim >= threshold:
+            similar_issues.append({
+                "number": others[i]["number"],
+                "similarity": float(sim),
+            })
+
+    similar_issues.sort(key=lambda x: x["similarity"], reverse=True)
+
+    return jsonify({"similar_issues": similar_issues}), 200
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8333))
     app.run(host="0.0.0.0", port=port)

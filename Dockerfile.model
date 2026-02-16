@@ -31,4 +31,4 @@ ENV PORT=8233
 EXPOSE 8233
 
 # Run with gunicorn (DO NOT use multiple workers)
-CMD ["gunicorn", "duplicacy_checker:app", "--workers", "1", "--threads", "1", "--bind", "0.0.0.0:8233"]
+CMD ["gunicorn", "duplicacy_checker:app", "--workers", "1", "--threads", "1", "--timeout", "120", "--bind", "0.0.0.0:8233"]

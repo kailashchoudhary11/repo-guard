@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/google/go-github/v62/github"
 	db "github.com/kailashchoudhary11/repo-guard/db/generated"
@@ -18,6 +17,27 @@ import (
 	"github.com/kailashchoudhary11/repo-guard/models"
 	"github.com/kailashchoudhary11/repo-guard/services"
 )
+
+type batchIssue struct {
+	Number int    `json:"number"`
+	Title  string `json:"title"`
+	Body   string `json:"body"`
+}
+
+type batchRequest struct {
+	CurrentIssue batchIssue   `json:"current_issue"`
+	OtherIssues  []batchIssue `json:"other_issues"`
+	Threshold    float32      `json:"threshold"`
+}
+
+type similarIssueResult struct {
+	Number     int     `json:"number"`
+	Similarity float32 `json:"similarity"`
+}
+
+type batchResponse struct {
+	SimilarIssues []similarIssueResult `json:"similar_issues"`
+}
 
 func Webhook(w http.ResponseWriter, r *http.Request) {
 	clientId := os.Getenv("CLIENT_ID")
@@ -98,39 +118,69 @@ func handleSimilarityCheck(
 ) {
 	allOpenIssues := services.FetchIssues(githubClient, repo)
 
-	duplicateIssue := make(chan int, len(allOpenIssues))
-	var wg sync.WaitGroup
-
+	otherIssues := make([]batchIssue, 0, len(allOpenIssues))
 	for _, issue := range allOpenIssues {
 		if issue.Number == currentIssue.Number {
 			continue
 		}
-
-		wg.Add(1)
-		go func(issue *models.Issue) {
-			defer wg.Done()
-			compareIssues(currentIssue, issue, duplicateIssue, threshold)
-		}(issue)
+		otherIssues = append(otherIssues, batchIssue{
+			Number: issue.Number,
+			Title:  issue.Title,
+			Body:   issue.Body,
+		})
 	}
 
-	go func() {
-		wg.Wait()
-		close(duplicateIssue)
-	}()
-
-	similarIssues := []int{}
-	issueLinks := []string{}
-
-	for issueNumber := range duplicateIssue {
-		if issueNumber > -1 {
-			similarIssues = append(similarIssues, issueNumber)
-			issueLinks = append(issueLinks, fmt.Sprintf("#%d", issueNumber))
-		}
+	if len(otherIssues) == 0 {
+		fmt.Println("No other open issues to compare against")
+		return
 	}
 
-	if len(similarIssues) == 0 {
+	reqPayload := batchRequest{
+		CurrentIssue: batchIssue{
+			Number: currentIssue.Number,
+			Title:  currentIssue.Title,
+			Body:   currentIssue.Body,
+		},
+		OtherIssues: otherIssues,
+		Threshold:   threshold,
+	}
+
+	jsonBody, err := json.Marshal(reqPayload)
+	if err != nil {
+		fmt.Println("Error marshaling batch request", err)
+		return
+	}
+
+	aiModelURL := os.Getenv("AI_MODEL_URL")
+	requestURL := fmt.Sprintf("%vbatch_compare", aiModelURL)
+
+	res, err := http.Post(requestURL, "application/json", bytes.NewReader(jsonBody))
+	if err != nil {
+		fmt.Println("Error in batch compare request", err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Cannot read batch response body", err)
+		return
+	}
+
+	var batchResp batchResponse
+	if err := json.Unmarshal(body, &batchResp); err != nil {
+		fmt.Println("Batch response is in invalid format", err)
+		return
+	}
+
+	if len(batchResp.SimilarIssues) == 0 {
 		fmt.Println("No similar issues found")
 		return
+	}
+
+	issueLinks := make([]string, 0, len(batchResp.SimilarIssues))
+	for _, si := range batchResp.SimilarIssues {
+		issueLinks = append(issueLinks, fmt.Sprintf("#%d", si.Number))
 	}
 
 	issueComment := fmt.Sprintf(
@@ -152,50 +202,4 @@ func handleSimilarityCheck(
 			return
 		}
 	}
-
-	return
-}
-
-func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int, threshold float32) {
-	fmt.Println("Will be now comparing the issues")
-	payload := fmt.Sprintf(`{"issue1_title": "%v", "issue1_body": "", "issue2_title": "%v", "issue2_body": "" }`, issueOne.Title, issueTwo.Title)
-	jsonBody := []byte(payload)
-
-	bodyReader := bytes.NewReader(jsonBody)
-	response := struct {
-		Similarity float32 `json:"similarity"`
-	}{}
-
-	AIModelURL := os.Getenv("AI_MODEL_URL")
-
-	requestURL := fmt.Sprintf("%vcompare_issues", AIModelURL)
-	res, err := http.Post(requestURL, "application/json", bodyReader)
-	if err != nil {
-		fmt.Println("Error in making compare issues request", err)
-		isDuplicate <- -1
-		return
-	}
-
-	body, err := io.ReadAll(res.Body)
-	fmt.Println("The response from API is", string(body))
-	defer res.Body.Close()
-	if err != nil {
-		fmt.Println("Cannot read response body", err)
-		isDuplicate <- -1
-		return
-	}
-	fmt.Println(response)
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		fmt.Println("Response is in invalid format", err)
-		isDuplicate <- -1
-		return
-	}
-	if response.Similarity > threshold {
-		isDuplicate <- issueTwo.Number
-		return
-	}
-
-	isDuplicate <- -1
 }
