@@ -53,6 +53,22 @@ WHERE id = $1
 RETURNING id, installation_id, config_data, updated_by, installed_by;
 
 
+-- name: UpsertInstallationConfig :one
+INSERT INTO installations (
+    installation_id,
+    config_data,
+    updated_by,
+    installed_by
+) VALUES (
+    $1, $2, $3, $3
+)
+ON CONFLICT (installation_id) DO UPDATE
+SET
+    config_data = EXCLUDED.config_data,
+    updated_by = EXCLUDED.updated_by
+RETURNING id, installation_id, config_data, updated_by, installed_by;
+
+
 -- name: DeleteInstallation :exec
 DELETE FROM installations
 WHERE id = $1;

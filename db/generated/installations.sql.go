@@ -175,3 +175,38 @@ func (q *Queries) UpdateInstallationConfig(ctx context.Context, arg UpdateInstal
 	)
 	return i, err
 }
+
+const upsertInstallationConfig = `-- name: UpsertInstallationConfig :one
+INSERT INTO installations (
+    installation_id,
+    config_data,
+    updated_by,
+    installed_by
+) VALUES (
+    $1, $2, $3, $3
+)
+ON CONFLICT (installation_id) DO UPDATE
+SET
+    config_data = EXCLUDED.config_data,
+    updated_by = EXCLUDED.updated_by
+RETURNING id, installation_id, config_data, updated_by, installed_by
+`
+
+type UpsertInstallationConfigParams struct {
+	InstallationID string
+	ConfigData     json.RawMessage
+	UpdatedBy      string
+}
+
+func (q *Queries) UpsertInstallationConfig(ctx context.Context, arg UpsertInstallationConfigParams) (Installation, error) {
+	row := q.db.QueryRow(ctx, upsertInstallationConfig, arg.InstallationID, arg.ConfigData, arg.UpdatedBy)
+	var i Installation
+	err := row.Scan(
+		&i.ID,
+		&i.InstallationID,
+		&i.ConfigData,
+		&i.UpdatedBy,
+		&i.InstalledBy,
+	)
+	return i, err
+}

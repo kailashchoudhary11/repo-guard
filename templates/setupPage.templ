@@ -1,6 +1,6 @@
 package templates
 
-templ SetupPage() {
+templ SetupPage(installationID string) {
 	@Layout("Setup configurations") {
 		<style>
 			/* Toggle switch */
@@ -185,6 +185,7 @@ templ SetupPage() {
 				<!-- Form card -->
 				<div class="max-w-2xl mx-auto form-card">
 					<form method="POST" action="/setup/save">
+						<input type="hidden" name="installation_id" value={ installationID }/>
 						<!-- Auto-close toggle -->
 						<div class="flex items-center justify-between gap-8">
 							<div>

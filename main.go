@@ -18,6 +18,7 @@ func main() {
 	router.HandleFunc("/privacy-policy", handlers.PrivacyPolicy)
 	router.HandleFunc("/webhook", handlers.Webhook)
 	router.HandleFunc("/setup", handlers.Setup)
+	router.HandleFunc("/setup/save", handlers.SetupSave)
 	router.HandleFunc("/", handlers.Index)
 
 	fmt.Println("Service is up and running at port 8000")

@@ -84,6 +84,14 @@ ALTER TABLE ONLY public.installations
 
 
 --
+-- Name: installations installations_installation_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.installations
+    ADD CONSTRAINT installations_installation_id_key UNIQUE (installation_id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 

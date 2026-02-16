@@ -47,23 +47,44 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 	if webhookPayload.Action == "opened" {
 		accessToken := services.GetInstallationAccessToken(webhookPayload.Installation.ID, jwtToken)
 		authenticatedClient := initializers.GetClientWithToken(accessToken)
-		shouldClose := false
+		config := &models.InstallationConfig{
+			ShouldClose: false,
+			Language:    "english",
+			Sensitivity: "medium",
+		}
 
 		conn, err := initializers.GetDBClient(ctx)
 		if err != nil {
 			fmt.Println("Unable to connect to database:", err)
-		}
-		defer conn.Close(ctx)
-		queries := db.New(conn)
-		installationDetails, err := queries.GetInstallationByInstallationID(ctx, string(webhookPayload.Installation.ID))
-		config, err := installationDetails.Config()
-		if err != nil {
-			fmt.Println("Error in fetching installation config", err)
 		} else {
-			shouldClose = config.ShouldClose
+			defer conn.Close(ctx)
+			queries := db.New(conn)
+			installationDetails, err := queries.GetInstallationByInstallationID(ctx, fmt.Sprintf("%d", webhookPayload.Installation.ID))
+			if err != nil {
+				fmt.Println("Error in fetching installation details", err)
+			} else {
+				dbConfig, err := installationDetails.Config()
+				if err != nil {
+					fmt.Println("Error in parsing installation config", err)
+				} else {
+					config = dbConfig
+				}
+			}
 		}
 
-		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, shouldClose)
+		threshold := sensitivityToThreshold(config.Sensitivity)
+		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, config.ShouldClose, threshold)
+	}
+}
+
+func sensitivityToThreshold(sensitivity string) float32 {
+	switch sensitivity {
+	case "low":
+		return 0.90
+	case "high":
+		return 0.75
+	default:
+		return 0.85
 	}
 }
 
@@ -73,6 +94,7 @@ func handleSimilarityCheck(
 	repo models.Repository,
 	currentIssue *models.Issue,
 	shouldClose bool,
+	threshold float32,
 ) {
 	allOpenIssues := services.FetchIssues(githubClient, repo)
 
@@ -87,7 +109,7 @@ func handleSimilarityCheck(
 		wg.Add(1)
 		go func(issue *models.Issue) {
 			defer wg.Done()
-			compareIssues(currentIssue, issue, duplicateIssue)
+			compareIssues(currentIssue, issue, duplicateIssue, threshold)
 		}(issue)
 	}
 
@@ -134,7 +156,7 @@ func handleSimilarityCheck(
 	return
 }
 
-func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int) {
+func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate chan int, threshold float32) {
 	fmt.Println("Will be now comparing the issues")
 	payload := fmt.Sprintf(`{"issue1_title": "%v", "issue1_body": "", "issue2_title": "%v", "issue2_body": "" }`, issueOne.Title, issueTwo.Title)
 	jsonBody := []byte(payload)
@@ -170,7 +192,7 @@ func compareIssues(issueOne *models.Issue, issueTwo *models.Issue, isDuplicate c
 		isDuplicate <- -1
 		return
 	}
-	if response.Similarity > 0.85 {
+	if response.Similarity > threshold {
 		isDuplicate <- issueTwo.Number
 		return
 	}
