@@ -25,9 +25,10 @@ type batchIssue struct {
 }
 
 type batchRequest struct {
-	CurrentIssue batchIssue   `json:"current_issue"`
-	OtherIssues  []batchIssue `json:"other_issues"`
-	Threshold    float32      `json:"threshold"`
+	CurrentIssue batchIssue             `json:"current_issue"`
+	OtherIssues  []batchIssue           `json:"other_issues"`
+	Threshold    float32                `json:"threshold"`
+	Templates    []services.TemplateFile `json:"templates,omitempty"`
 }
 
 type similarIssueResult struct {
@@ -93,7 +94,8 @@ func Webhook(w http.ResponseWriter, r *http.Request) {
 		}
 
 		threshold := float32(config.Sensitivity) / 100.0
-		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, config.ShouldClose, threshold)
+		templates := services.FetchIssueTemplates(authenticatedClient, webhookPayload.Repository)
+		handleSimilarityCheck(context.Background(), authenticatedClient, webhookPayload.Repository, &webhookPayload.Issue, config.ShouldClose, threshold, templates)
 	}
 }
 
@@ -104,6 +106,7 @@ func handleSimilarityCheck(
 	currentIssue *models.Issue,
 	shouldClose bool,
 	threshold float32,
+	templates []services.TemplateFile,
 ) {
 	allOpenIssues := services.FetchIssues(githubClient, repo)
 
@@ -132,6 +135,7 @@ func handleSimilarityCheck(
 		},
 		OtherIssues: otherIssues,
 		Threshold:   threshold,
+		Templates:   templates,
 	}
 
 	jsonBody, err := json.Marshal(reqPayload)

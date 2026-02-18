@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/google/go-github/v62/github"
@@ -101,6 +102,63 @@ func CloseIssue(ctx context.Context, client *github.Client, repo models.Reposito
 		return err
 	}
 	return nil
+}
+
+type TemplateFile struct {
+	Name    string `json:"name"`
+	Content string `json:"content"`
+}
+
+func FetchIssueTemplates(client *github.Client, repo models.Repository) []TemplateFile {
+	_, dirContents, _, err := client.Repositories.GetContents(
+		context.Background(),
+		repo.Owner.Username,
+		repo.Name,
+		".github/ISSUE_TEMPLATE",
+		nil,
+	)
+	if err != nil {
+		fmt.Println("No issue templates found (or error fetching):", err)
+		return nil
+	}
+
+	var templates []TemplateFile
+	for _, file := range dirContents {
+		name := file.GetName()
+		ext := filepath.Ext(name)
+		if ext != ".md" && ext != ".yml" && ext != ".yaml" {
+			continue
+		}
+
+		content, err := file.GetContent()
+		if err != nil || content == "" {
+			// File too large for inline content, fetch via API
+			fileContent, _, _, err := client.Repositories.GetContents(
+				context.Background(),
+				repo.Owner.Username,
+				repo.Name,
+				file.GetPath(),
+				nil,
+			)
+			if err != nil {
+				fmt.Println("Error fetching template file:", name, err)
+				continue
+			}
+			content, err = fileContent.GetContent()
+			if err != nil {
+				fmt.Println("Error decoding template file:", name, err)
+				continue
+			}
+		}
+
+		templates = append(templates, TemplateFile{
+			Name:    name,
+			Content: content,
+		})
+	}
+
+	fmt.Printf("Fetched %d issue templates from repo\n", len(templates))
+	return templates
 }
 
 func GetInstallationAccessToken(installationId int, jwtToken string) string {
