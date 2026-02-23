@@ -53,7 +53,33 @@ func Setup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	username := user.GetLogin()
-	template := templates.SetupPage(installationID, username)
+
+	config := models.InstallationConfig{
+		ShouldClose: false,
+		Language:    "english",
+		Sensitivity: 90,
+	}
+
+	conn, err := initializers.GetDBClient(ctx)
+	if err != nil {
+		fmt.Println("Unable to connect to database:", err)
+	} else {
+		defer conn.Close(ctx)
+		queries := db.New(conn)
+		installationDetails, err := queries.GetInstallationByInstallationID(ctx, installationID)
+		if err != nil {
+			fmt.Println("No existing config found, using defaults:", err)
+		} else {
+			dbConfig, err := installationDetails.Config()
+			if err != nil {
+				fmt.Println("Error parsing installation config:", err)
+			} else {
+				config = *dbConfig
+			}
+		}
+	}
+
+	template := templates.SetupPage(installationID, username, config)
 	if err := template.Render(ctx, w); err != nil {
 		fmt.Println("Error in rendering the template")
 		w.WriteHeader(http.StatusInternalServerError)
