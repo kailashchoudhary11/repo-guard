@@ -8,7 +8,12 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func SetupPage(installationID string, username string) templ.Component {
+import (
+	"fmt"
+	"github.com/kailashchoudhary11/repo-guard/models"
+)
+
+func SetupPage(installationID string, username string, config models.InstallationConfig) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -48,7 +53,7 @@ func SetupPage(installationID string, username string) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(installationID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 202, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 207, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -61,13 +66,139 @@ func SetupPage(installationID string, username string) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 203, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 208, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><!-- Auto-close toggle --><div class=\"flex items-center justify-between gap-8\"><div><label for=\"auto_close\" class=\"block text-lg font-semibold mb-2 cursor-pointer\">Auto-close duplicate issues</label><p class=\"field-desc\">Automatically close new issues detected as duplicates and link to the original.</p></div><label class=\"flex-shrink-0\"><input type=\"checkbox\" id=\"auto_close\" name=\"auto_close\" class=\"toggle-checkbox\"><div class=\"toggle-track\"></div></label></div><div class=\"section-divider\"></div><!-- Language selector --><div><label for=\"language\" class=\"block text-lg font-semibold mb-2\">Language</label><p class=\"field-desc mb-4\">Choose the language for Repo Guard's comments on issues.</p><select id=\"language\" name=\"language\" class=\"custom-select\"><option value=\"english\">English</option> <option value=\"spanish\">Spanish</option> <option value=\"french\">French</option> <option value=\"german\">German</option> <option value=\"portuguese\">Portuguese</option> <option value=\"chinese\">Chinese</option> <option value=\"japanese\">Japanese</option> <option value=\"korean\">Korean</option> <option value=\"hindi\">Hindi</option></select></div><div class=\"section-divider\"></div><!-- Match Threshold --><div><label for=\"sensitivity\" class=\"block text-lg font-semibold mb-2\">Match Threshold</label><p class=\"field-desc mb-6\">Issues must be at least this similar to be flagged as duplicates. A higher value means stricter matching — only near-identical issues will be flagged.</p><div class=\"slider-container\"><div class=\"slider-value\" id=\"sensitivity-display\">90%</div><input type=\"range\" id=\"sensitivity\" name=\"sensitivity\" min=\"0\" max=\"100\" value=\"90\" class=\"range-slider\"><div class=\"slider-labels\"><span>More matches</span> <span>Fewer matches</span></div></div></div><script>\n\t\t\t\t\t\t\tdocument.getElementById('sensitivity').addEventListener('input', function() {\n\t\t\t\t\t\t\t\tdocument.getElementById('sensitivity-display').textContent = this.value + '%';\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t</script><!-- Submit --><button type=\"submit\" class=\"submit-btn font-rubik\">Save Configuration</button></form></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><!-- Auto-close toggle --><div class=\"flex items-center justify-between gap-8\"><div><label for=\"auto_close\" class=\"block text-lg font-semibold mb-2 cursor-pointer\">Auto-close duplicate issues</label><p class=\"field-desc\">Automatically close new issues detected as duplicates and link to the original.</p></div><label class=\"flex-shrink-0\"><input type=\"checkbox\" id=\"auto_close\" name=\"auto_close\" class=\"toggle-checkbox\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.ShouldClose {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " checked")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "><div class=\"toggle-track\"></div></label></div><div class=\"section-divider\"></div><!-- Language selector --><div><label for=\"language\" class=\"block text-lg font-semibold mb-2\">Language</label><p class=\"field-desc mb-4\">Choose the language for Repo Guard's comments on issues.</p><select id=\"language\" name=\"language\" class=\"custom-select\"><option value=\"english\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "english" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, ">English</option> <option value=\"spanish\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "spanish" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, ">Spanish</option> <option value=\"french\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "french" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ">French</option> <option value=\"german\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "german" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, ">German</option> <option value=\"portuguese\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "portuguese" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, ">Portuguese</option> <option value=\"chinese\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "chinese" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">Chinese</option> <option value=\"japanese\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "japanese" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">Japanese</option> <option value=\"korean\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "korean" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">Korean</option> <option value=\"hindi\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if config.Language == "hindi" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, ">Hindi</option></select></div><div class=\"section-divider\"></div><!-- Match Threshold --><div><label for=\"sensitivity\" class=\"block text-lg font-semibold mb-2\">Match Threshold</label><p class=\"field-desc mb-6\">Issues must be at least this similar to be flagged as duplicates. A higher value means stricter matching — only near-identical issues will be flagged.</p><div class=\"slider-container\"><div class=\"slider-value\" id=\"sensitivity-display\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%%", config.Sensitivity))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 262, Col: 100}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><input type=\"range\" id=\"sensitivity\" name=\"sensitivity\" min=\"0\" max=\"100\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", config.Sensitivity))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/setupPage.templ`, Line: 269, Col: 54}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" class=\"range-slider\"><div class=\"slider-labels\"><span>More matches</span> <span>Fewer matches</span></div></div></div><script>\n\t\t\t\t\t\t\tdocument.getElementById('sensitivity').addEventListener('input', function() {\n\t\t\t\t\t\t\t\tdocument.getElementById('sensitivity-display').textContent = this.value + '%';\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t</script><!-- Submit --><button type=\"submit\" class=\"submit-btn font-rubik\">Save Configuration</button></form></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
